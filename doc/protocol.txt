@@ -20,8 +20,8 @@ character string containing the actual answer, and ends with CR.
 
 1) Output Voltage Programming
 
-  Instruction: 'd1,X' (X: 0 .. 4095)
-  Answer: 'd1,X'
+  Instruction: d1,X (X: 0 .. 4095)
+  Answer: d1,X
 
 2) Output Current Programming
 
