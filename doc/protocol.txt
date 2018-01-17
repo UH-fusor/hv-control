@@ -1,0 +1,108 @@
+Control protocol for RS232 of Technix SR 5kw to 10kW devices
+============================================================
+
+
+
+
+RS232 line specs: 1 start bit, 8 data bits, 1 stop bit, no parity,
+                  Full Duplex mode, baud rate 9600
+
+
+The control protocol of Technix-HV SR series is very simple.  The
+communication is based on command/answer message pairs, each ending
+with CR (ASCII code 13).
+
+Each 'command' consists of an ASCII character, followed by one or more
+function parameters, and ends with CR. The 'answer' consists of the
+string which was sent in the previous 'command' plus the ASCII
+character string containing the actual answer, and ends with CR.
+
+
+1) Output Voltage Programming
+
+  Instruction: 'd1,X' (X: 0 .. 4095)
+  Answer: 'd1,X'
+
+2) Output Current Programming
+
+  Instruction: d2,X (X: 0 .. 4095)
+  Answer: d2,X
+
+3) Output Voltage Monitor
+
+  Instruction: a1
+  Answer: a1X (X: 0 .. 4095)
+
+4) Output Current Monitor
+
+  Instruction: a2
+  Answer: a2X (X: 0 .. 4095)
+
+The 'X' above is a 12-bit unsigned integer, linearly scaled to cover
+the whole voltage or current range of the PSU.  In our case
+(SR100kV-5kW with negative polarity), e.g. for voltage X=0 corresponds
+U=0V (ie. the ground potential), and X=4095 corresponds to U=-100kV.
+
+5) HV On
+
+  Instruction: P5,1
+  Answer P5,1
+  --> delay 100ms
+  Instruction: P5,0
+  Answer P5,0
+
+6) HV Off
+
+  Instruction: P6,1
+  Answer P6,1
+  --> delay 100ms
+  Instruction: P6,0
+  Answer P6,0
+
+7) Local/remote mode
+
+  Instruction: P7,1 Answer: P7,1: local mode
+  Instruction: P7,0 Answer: P7,0: remote mode
+
+8) Inhibit
+
+ Instruction: P8,1 Answer: P8,1: inhibit
+ Instruction: P8,0 Answer: P8,0: idle
+
+9) Power supply status inquiry
+
+  Instruction: E
+  Answer: EX (X: 0 .. 255)
+
+  Answer is 8 bit coded:
+
+  - PL5, PL6, PL7, PL8 are input bits corresponding to P5, P6, P7 et
+    P8 instructions (see the P? codes in the above sections 5-8).
+
+  - PL1, PL2, PL3, PL4 bits are status bits for following information:
+
+  PL1 = 1: voltage regulation
+  PL1 = 0: current regulation
+
+  PL2 = 1: fault
+  PL2 = 0: no fault
+
+  PL3 = 1: open interlock
+  PL3 = 0: closed interlock
+
+  PL4 = 1: HV ON
+  PL4 = 0: HV OFF
+
+  MSB                         LSB
+  PL8 PL7 PL6 PL5 PL4 PL3 PL2 PL1
+
+
+
+
+NOTE1: To be on the safe side, it might be wise to ensure, that no
+       other commands are ever passed to HV generator.  We don't know
+       how it handles undefined strings.
+
+NOTE2: The input and output analog info (voltage and current) have 12
+       bits resolution.
+
