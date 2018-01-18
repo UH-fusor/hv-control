@@ -1,8 +1,8 @@
-# hv-control
+# hvcontrol
 
 The power supplies from Technix http://www.technix-hv.com can be
 controlled via RS232 bus using a simple ASCII based protocol.  The aim
-of the hv-control project is to implement a Python3 control library
+of the hvcontrol project is to implement a Python3 control library
 for the Technix SR 5kW to 10kW series
 http://www.technix-hv.com/technix/products/HV-generators/sr-5000-to-10000-watts.
 We are testing the implementation with Technix SR100kV-5kW, having a
