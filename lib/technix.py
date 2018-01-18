@@ -5,7 +5,7 @@ def send_command(command):
     Ok.  Retuns a tuple (voltage, current).
     """
     
-    print("command")
+    print(command)
     return (0.0, 0.0)
 
 if __name__=='__main__':
