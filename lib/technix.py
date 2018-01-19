@@ -50,7 +50,7 @@ HV=False
 # The connection object
 serconnection=None
 
-def halt(message):
+def safehalt(message):
     """Prints 'message', turns off the HV and exits."""
     print(message)
     if serconnection!=None:
@@ -75,9 +75,9 @@ def istrue(boolean):
              boolean.upper()=='F' or boolean=='0':
             return False
         else:
-            halt("Don't know how to interpret boolean " + str(boolean))
+            safehalt("Don't know how to interpret boolean " + str(boolean))
     except AttributeError:
-        halt("technix.istrue(): boolean '" + str(boolean) + "' seems too problematic for me.")
+        safehalt("technix.istrue(): boolean '" + str(boolean) + "' seems too problematic for me.")
 
 def init_serial():
     """Initializes the serial port and returns the connection object, if
@@ -99,7 +99,7 @@ def init_serial():
     try:
         parity = paritydict[SER_PARITY.upper()]
     except KeyError:
-        halt("Unknown parity in the config file: " + str(SER_PARITY))
+        safehalt("Unknown parity in the config file: " + str(SER_PARITY))
 
     stopbitsdict = {
         '1'   : serial.STOPBITS_ONE,
@@ -108,7 +108,7 @@ def init_serial():
     try:
         stopbits = stopbitsdict[SER_STOPBITS]
     except KeyError:
-        halt("Unknown stopbits in the config file: " + str(SER_STOPBITS))
+        safehalt("Unknown stopbits in the config file: " + str(SER_STOPBITS))
 
     bytesizedict = {
         5 : serial.FIVEBITS,
@@ -118,7 +118,7 @@ def init_serial():
     try:
         bytesize = bytesizedict[SER_BYTESIZE]
     except KeyError:
-        halt("Unknown stopbits in the config file: " + str(SER_BYTESIZE))
+        safehalt("Unknown stopbits in the config file: " + str(SER_BYTESIZE))
 
     if SER_TIMEOUT.upper()=='NONE':
         timeout=None
@@ -126,17 +126,26 @@ def init_serial():
         try:
             timeout=float(SER_TIMEOUT)
         except ValueError:
-            halt("Unknown timeout in the config file: " + str(SER_TIMEOUT))
+            safehalt("Unknown timeout in the config file: " + str(SER_TIMEOUT))
 
     rtscts  = istrue(SER_RTSCTS)
     dsrdtr  = istrue(SER_DSRDTR)
     xonxoff = istrue(SER_XONXOFF)
 
-    serconnection = serial.Serial(port=SER_PORT,
-                                  baudrate=SER_BAUDRATE, parity=parity,
-                                  stopbits=stopbits, bytesize=bytesize,
-                                  timeout=timeout, rtscts=rtscts,
-                                  dsrdtr=dsrdtr, xonxoff=xonxoff)
+    # Exclusive was introduced in pySerial v3.3
+    if float(serial.VERSION)<3.3:
+        serconnection = serial.Serial(port=SER_PORT,
+                                      baudrate=SER_BAUDRATE, parity=parity,
+                                      stopbits=stopbits, bytesize=bytesize,
+                                      timeout=timeout, rtscts=rtscts,
+                                      dsrdtr=dsrdtr, xonxoff=xonxoff)
+    else:
+        serconnection = serial.Serial(port=SER_PORT,
+                                      baudrate=SER_BAUDRATE, parity=parity,
+                                      stopbits=stopbits, bytesize=bytesize,
+                                      timeout=timeout, rtscts=rtscts,
+                                      dsrdtr=dsrdtr, xonxoff=xonxoff,
+                                      exclusive=True)
     return serconnection
 
 def set_voltage(U):
