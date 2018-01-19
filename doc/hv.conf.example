@@ -11,12 +11,12 @@ MAX_VOLTAGE=-100.0
 VOLTAGE_LIMIT=-20.0
 
 [current]
-# MAXCURRENT is the highes current the HV PSU can produce in mA. The value
-# is used e.g. for scaling the 12-bit integer, which the Technix
+# MAXCURRENT is the highes current the HV PSU can produce in mA. The
+# value is used e.g. for scaling the 12-bit integer, which the Technix
 # serial protocol uses for setting the current value.
 MAX_CURRENT=50.0
 
-# CURRENTLIMIT is the maximum voltage for the particular application
+# CURRENTLIMIT is the maximum current for the particular application
 # in mA.  The module will not ever set the current above the limit.
 CURRENT_LIMIT=5.0
 
