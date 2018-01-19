@@ -11,8 +11,8 @@ configfile = 'hv.conf'
 cfg = configparser.ConfigParser()
 cfg.read(configfile)
 
-# In config file, the voltages are given in kV for convenience.  But
-# the module uses V internally.  Therefore multiplying voltages by
+# In the config file, the voltages are given in kV for convenience.
+# But the module uses V internally.  Therefore multiplying voltages by
 # 1000.0.  The currents are given and used in mA.
 MAX_VOLTAGE   = float( cfg.get('voltage', 'MAX_VOLTAGE'   )) * 1000.0
 MAX_CURRENT   = float( cfg.get('current', 'MAX_CURRENT'   ))
@@ -61,8 +61,7 @@ def safehalt(message):
         hv_off()
         serconnection.close()
     print("Stopping!")
-    import sys
-    sys.exit(1)
+    import sys; sys.exit(1)
 
 def istrue(boolean):
     """Tries to interpret a string as True or False.  Halts if fails, or
@@ -77,16 +76,17 @@ def istrue(boolean):
         else:
             safehalt("Don't know how to interpret boolean " + str(boolean))
     except AttributeError:
-        safehalt("technix.istrue(): boolean '" + str(boolean) + "' seems too problematic for me.")
+        safehalt("technix.istrue(): boolean '" + str(boolean) +
+                 "' seems too problematic for me.")
 
 def init_serial():
     """Initializes the serial port and returns the connection object, if
     success.  Halts otherwise.
     """
 
-    # If there is too much garbage in the configfile, either
+    # If there is too difficult garbage in the config file, either
     # ValueError or KeyError will be thrown before the serial.Serial()
-    # is called.
+    # is instantiated.
 
     global serconnection
 
@@ -99,7 +99,7 @@ def init_serial():
     try:
         parity = paritydict[SER_PARITY.upper()]
     except KeyError:
-        safehalt("Unknown parity in the config file: " + str(SER_PARITY))
+        safehalt("Can not parse the parity in the config file: " + str(SER_PARITY))
 
     stopbitsdict = {
         '1'   : serial.STOPBITS_ONE,
@@ -108,7 +108,7 @@ def init_serial():
     try:
         stopbits = stopbitsdict[SER_STOPBITS]
     except KeyError:
-        safehalt("Unknown stopbits in the config file: " + str(SER_STOPBITS))
+        safehalt("Can not parse the stopbits in the config file: " + str(SER_STOPBITS))
 
     bytesizedict = {
         5 : serial.FIVEBITS,
@@ -118,7 +118,7 @@ def init_serial():
     try:
         bytesize = bytesizedict[SER_BYTESIZE]
     except KeyError:
-        safehalt("Unknown stopbits in the config file: " + str(SER_BYTESIZE))
+        safehalt("Can not parse the stopbits in the config file: " + str(SER_BYTESIZE))
 
     if SER_TIMEOUT.upper()=='NONE':
         timeout=None
@@ -126,7 +126,7 @@ def init_serial():
         try:
             timeout=float(SER_TIMEOUT)
         except ValueError:
-            safehalt("Unknown timeout in the config file: " + str(SER_TIMEOUT))
+            safehalt("Can not parse the timeout in the config file: " + str(SER_TIMEOUT))
 
     rtscts  = istrue(SER_RTSCTS)
     dsrdtr  = istrue(SER_DSRDTR)
