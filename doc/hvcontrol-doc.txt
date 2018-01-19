@@ -1,2 +1,2 @@
-Please copy doc/hv.conf.example to the run time working directory, and
-modify if needed.
+Please copy doc/hv.conf.example to the run time working directory as
+hv.conf, and modify if needed.
