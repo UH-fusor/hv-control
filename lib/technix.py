@@ -22,7 +22,10 @@ SER_BAUDRATE  = int(cfg.get('serial', 'baudrate'))
 SER_PARITY    = cfg.get('serial', 'parity')
 SER_STOPBITS  = cfg.get('serial', 'stopbits')
 SER_BYTESIZE  = int(cfg.get('serial', 'bytesize'))
-SER_TIMEOUT = cfg.get('serial', 'timeout')
+SER_TIMEOUT   = cfg.get('serial', 'timeout')
+SER_RTSCTS    = cfg.get('serial', 'rtscts')
+SER_DSRDTR    = cfg.get('serial', 'dsrdtr')
+SER_XONXOFF   = cfg.get('serial', 'xonxoff')
 
 INT_MAX=2**12-1
 
@@ -36,59 +39,94 @@ U_counted = 0.0
 I_counted = 0.0
 
 HV=False
+serconnection=None
+
+def halt(message):
+    """Prints 'message', turns off the HV and exits."""
+    print(message)
+    if serconnection!=None:
+        # Here only, if the connection has already been opened.
+        print("Turning off the HV output.")
+        set_voltage(0.0)
+        set_current(0.0)
+        hv_off()
+        serconnection.close()
+    print("Stopping!")
+    import sys
+    sys.exit(1)
+
+def istrue(boolean):
+    """Tries to interpret a string as True or False.  Halts if fails, or
+    if called with an object which doesn't have upper() attribute."""
+    try:
+        if boolean.upper()=='TRUE' or boolean.upper()=='YES' or \
+           boolean.upper()=='Y' or boolean=='1':
+            return True
+        elif boolean.upper()=='FALSE' or boolean.upper()=='NO' or \
+             boolean.upper()=='F' or boolean=='0':
+            return False
+        else:
+            halt("Don't know how to interpret boolean " + str(boolean))
+    except AttributeError:
+        halt("technix.istrue(): boolean '" + str(boolean) + "' seems too problematic for me.")
 
 def init_serial():
     """Initializing the serial port"""
-    if SER_PARITY.upper() == 'N':
-        parity = serial.PARITY_NONE
-    elif SER_PARITY.upper() == 'E':
-        parity = serial.PARITY_EVEN
-    elif SER_PARITY.upper() == 'O':
-        parity = serial.PARITY_ODD
-    elif SER_PARITY.upper() == 'S':
-        parity = serial.PARITY_SPACE
-    elif SER_PARITY.upper() == 'M':
-        parity = serial.PARITY_MARK
-    else:
-        import sys
-        print("Unknown parity in config file: ", SER_PARITY)
-        print("Stopping")
-        sys.exit(1)
-    if SER_STOPBITS=='1':
-        stopbits=serial.STOPBITS_ONE
-    elif SER_STOPBITS=='1.5':
-        stopbits=serial.STOPBITS_ONE_POINT_FIVE
-    elif SER_STOPBITS=='2':
-        stopbits=serial.STOPBITS_TWO
-    else:
-        import sys
-        print("Unknown stopbits in config file: ", SER_STOPBITS)
-        print("Stopping")
-        sys.exit(1)
 
-    if SER_BYTESIZE==5:
-        bytesize=serial.FIVEBITS
-    elif SER_BYTESIZE==6:
-        bytesize=serial.SIXBITS
-    elif SER_BYTESIZE==7:
-         bytesize=serial.SEVENBITS
-    elif SER_BYTESIZE==8:
-         bytesize=serial.EIGHTBITS
-    else:
-        import sys
-        print("Unknown bytesize in config file: ", SER_BYTESIZE)
-        print("Stopping")
-        sys.exit(1)
+    # If there is too much garbage in the configfile, either
+    # ValueError or KeyError will be thrown before the serial.Serial()
+    # is called.
+
+    global serconnection
+
+    paritydict = {
+        'N' : serial.PARITY_NONE,
+        'E' : serial.PARITY_EVEN,
+        'O' : serial.PARITY_ODD,
+        'S' : serial.PARITY_SPACE,
+        'M' : serial.PARITY_MARK }
+    try:
+        parity = paritydict[SER_PARITY.upper()]
+    except KeyError:
+        halt("Unknown parity in the config file: " + str(SER_PARITY))
+
+    stopbitsdict = {
+        '1'   : serial.STOPBITS_ONE,
+        '1.5' : serial.STOPBITS_ONE_POINT_FIVE,
+        '2'   : serial.STOPBITS_TWO }
+    try:
+        stopbits = stopbitsdict[SER_STOPBITS]
+    except KeyError:
+        halt("Unknown stopbits in the config file: " + str(SER_STOPBITS))
+
+    bytesizedict = {
+        5 : serial.FIVEBITS,
+        6 : serial.SIXBITS,
+        7 : serial.SEVENBITS,
+        8 : serial.EIGHTBITS }
+    try:
+        bytesize = bytesizedict[SER_BYTESIZE]
+    except KeyError:
+        halt("Unknown stopbits in the config file: " + str(SER_BYTESIZE))
 
     if SER_TIMEOUT.upper()=='NONE':
         timeout=None
     else:
-        timeout=float(SER_TIMEOUT) # if config file contains garbage,
-                                   # this throughs a ValueError.
+        try:
+            timeout=float(SER_TIMEOUT)
+        except ValueError:
+            halt("Unknown timeout in the config file: " + str(SER_TIMEOUT))
 
-    return serial.Serial(port=SER_PORT, baudrate=SER_BAUDRATE,
-                         parity=parity, stopbits=stopbits, bytesize=bytesize,
-                         timeout=timeout, rtscts=True, xonxoff=False)
+    rtscts  = istrue(SER_RTSCTS)
+    dsrdtr  = istrue(SER_DSRDTR)
+    xonxoff = istrue(SER_XONXOFF)
+
+    serconnection = serial.Serial(port=SER_PORT,
+                                  baudrate=SER_BAUDRATE, parity=parity,
+                                  stopbits=stopbits, bytesize=bytesize,
+                                  timeout=timeout, rtscts=rtscts,
+                                  dsrdtr=dsrdtr, xonxoff=xonxoff)
+    return serconnection
 
 def set_voltage(U):
     """Tries to set the voltage as U (given in volts).
