@@ -161,7 +161,7 @@ def hv_off():
     __send_command('P6,1')
     time.sleep(0.1) # delay 100ms
     __send_command('P6,0')
-    HV=True
+    HV=False
 
 def local_mode():
     return __send_command('P7,1')
