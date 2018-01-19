@@ -12,33 +12,42 @@ cfg = configparser.ConfigParser()
 cfg.read(configfile)
 
 # In config file, the voltages are given in kV for convenience.  But
-# the module uses V internally.  The currents are given and used in mA.
-MAX_VOLTAGE   = float(cfg.get('voltage', 'MAX_VOLTAGE'  )) * 1000.0
-MAX_CURRENT   = float(cfg.get('current', 'MAX_CURRENT'  ))
-VOLTAGE_LIMIT = float(cfg.get('voltage', 'VOLTAGE_LIMIT')) * 1000.0
-CURRENT_LIMIT = float(cfg.get('current', 'CURRENT_LIMIT'))
-SER_PORT      = cfg.get('serial', 'port')
-SER_BAUDRATE  = int(cfg.get('serial', 'baudrate'))
-SER_PARITY    = cfg.get('serial', 'parity')
-SER_STOPBITS  = cfg.get('serial', 'stopbits')
-SER_BYTESIZE  = int(cfg.get('serial', 'bytesize'))
-SER_TIMEOUT   = cfg.get('serial', 'timeout')
-SER_RTSCTS    = cfg.get('serial', 'rtscts')
-SER_DSRDTR    = cfg.get('serial', 'dsrdtr')
-SER_XONXOFF   = cfg.get('serial', 'xonxoff')
+# the module uses V internally.  Therefore multiplying voltages by
+# 1000.0.  The currents are given and used in mA.
+MAX_VOLTAGE   = float( cfg.get('voltage', 'MAX_VOLTAGE'   )) * 1000.0
+MAX_CURRENT   = float( cfg.get('current', 'MAX_CURRENT'   ))
+VOLTAGE_LIMIT = float( cfg.get('voltage', 'VOLTAGE_LIMIT' )) * 1000.0
+CURRENT_LIMIT = float( cfg.get('current', 'CURRENT_LIMIT' ))
+SER_PORT      =        cfg.get('serial',  'port'          )
+SER_BAUDRATE  = int(   cfg.get('serial',  'baudrate'      ))
+SER_PARITY    =        cfg.get('serial',  'parity'        )
+SER_STOPBITS  =        cfg.get('serial',  'stopbits'      )
+SER_BYTESIZE  = int(   cfg.get('serial',  'bytesize'      ))
+SER_TIMEOUT   =        cfg.get('serial',  'timeout'       )
+SER_RTSCTS    =        cfg.get('serial',  'rtscts'        )
+SER_DSRDTR    =        cfg.get('serial',  'dsrdtr'        )
+SER_XONXOFF   =        cfg.get('serial',  'xonxoff'       )
 
+# The serial protocol uses 12-bit unsigned integer for setting the
+# voltage and current.
 INT_MAX=2**12-1
 
-# Serial protocol uses 12-bit unsigned integer for setting the voltage
-# and current.  The minimum steps are (in V and mA):
+#The minimum steps are (in V and mA):
 delta_U = MAX_VOLTAGE/INT_MAX
 delta_I = MAX_CURRENT/INT_MAX
+
+#
+# Global variables:
+#
 
 # Book keeping the present values of U and I.
 U_counted = 0.0
 I_counted = 0.0
 
+# High voltage on or off
 HV=False
+
+# The connection object
 serconnection=None
 
 def halt(message):
@@ -71,7 +80,9 @@ def istrue(boolean):
         halt("technix.istrue(): boolean '" + str(boolean) + "' seems too problematic for me.")
 
 def init_serial():
-    """Initializing the serial port"""
+    """Initializes the serial port and returns the connection object, if
+    success.  Halts otherwise.
+    """
 
     # If there is too much garbage in the configfile, either
     # ValueError or KeyError will be thrown before the serial.Serial()
@@ -245,7 +256,7 @@ def __send_inquiry(command):
     return "The result"
 
 def decrypt_the_inquiry(X):
-    """Return the answer X for instruction E in more user friendly manner.
+    """Returns the answer X for instruction E in more user friendly manner.
     """
     print("Sorry, not implemented:", X)
 
