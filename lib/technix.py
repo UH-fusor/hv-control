@@ -4,6 +4,7 @@ Module for controlling Technix SR high voltage PSU via serial bus
 """
 
 import configparser
+import serial
 import time
 
 configfile = 'hv.conf'
@@ -16,6 +17,12 @@ MAX_VOLTAGE   = float(cfg.get('voltage', 'MAX_VOLTAGE'  )) * 1000.0
 MAX_CURRENT   = float(cfg.get('current', 'MAX_CURRENT'  ))
 VOLTAGE_LIMIT = float(cfg.get('voltage', 'VOLTAGE_LIMIT')) * 1000.0
 CURRENT_LIMIT = float(cfg.get('current', 'CURRENT_LIMIT'))
+SER_PORT      = cfg.get('serial', 'port')
+SER_BAUDRATE  = int(cfg.get('serial', 'baudrate'))
+SER_PARITY    = cfg.get('serial', 'parity')
+SER_STOPBITS  = cfg.get('serial', 'stopbits')
+SER_BYTESIZE  = int(cfg.get('serial', 'bytesize'))
+SER_TIMEOUT = cfg.get('serial', 'timeout')
 
 INT_MAX=2**12-1
 
@@ -29,6 +36,59 @@ U_counted = 0.0
 I_counted = 0.0
 
 HV=False
+
+def init_serial():
+    """Initializing the serial port"""
+    if SER_PARITY.upper() == 'N':
+        parity = serial.PARITY_NONE
+    elif SER_PARITY.upper() == 'E':
+        parity = serial.PARITY_EVEN
+    elif SER_PARITY.upper() == 'O':
+        parity = serial.PARITY_ODD
+    elif SER_PARITY.upper() == 'S':
+        parity = serial.PARITY_SPACE
+    elif SER_PARITY.upper() == 'M':
+        parity = serial.PARITY_MARK
+    else:
+        import sys
+        print("Unknown parity in config file: ", SER_PARITY)
+        print("Stopping")
+        sys.exit(1)
+    if SER_STOPBITS=='1':
+        stopbits=serial.STOPBITS_ONE
+    elif SER_STOPBITS=='1.5':
+        stopbits=serial.STOPBITS_ONE_POINT_FIVE
+    elif SER_STOPBITS=='2':
+        stopbits=serial.STOPBITS_TWO
+    else:
+        import sys
+        print("Unknown stopbits in config file: ", SER_STOPBITS)
+        print("Stopping")
+        sys.exit(1)
+
+    if SER_BYTESIZE==5:
+        bytesize=serial.FIVEBITS
+    elif SER_BYTESIZE==6:
+        bytesize=serial.SIXBITS
+    elif SER_BYTESIZE==7:
+         bytesize=serial.SEVENBITS
+    elif SER_BYTESIZE==8:
+         bytesize=serial.EIGHTBITS
+    else:
+        import sys
+        print("Unknown bytesize in config file: ", SER_BYTESIZE)
+        print("Stopping")
+        sys.exit(1)
+
+    if SER_TIMEOUT.upper()=='NONE':
+        timeout=None
+    else:
+        timeout=float(SER_TIMEOUT) # if config file contains garbage,
+                                   # this throughs a ValueError.
+
+    return serial.Serial(port=SER_PORT, baudrate=SER_BAUDRATE,
+                         parity=parity, stopbits=stopbits, bytesize=bytesize,
+                         timeout=timeout, rtscts=True, xonxoff=False)
 
 def set_voltage(U):
     """Tries to set the voltage as U (given in volts).
