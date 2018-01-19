@@ -1,21 +1,33 @@
-[default]
+[voltage]
 # MAXVOLTAGE is the highest voltage the HV PSU can produce in kV.  For
 # negative polarity devices, the value is negative.  The value is used
 # e.g. for scaling the 12-bit integer, which the Technix serial
-# protocol use for setting the voltage value.
+# protocol uses for setting the voltage value.
 MAX_VOLTAGE=-100.0
-
-# MAXCURRENT is the highes current the HV PSU can produce in mA. The value
-# is used e.g. for scaling the 12-bit integer, which the Technix
-# serial protocol use for setting the current value.
-MAX_CURRENT=50.0
 
 # VOLTAGELIMIT is the maximum voltage for the particular application
 # in kV.  The module will not ever push the voltage above the limit.
 # For negative polarity PSU the value should be negative.
 VOLTAGE_LIMIT=-20.0
 
+[current]
+# MAXCURRENT is the highes current the HV PSU can produce in mA. The value
+# is used e.g. for scaling the 12-bit integer, which the Technix
+# serial protocol uses for setting the current value.
+MAX_CURRENT=50.0
+
 # CURRENTLIMIT is the maximum voltage for the particular application
-# in mA.  The module will not ever push the voltage above the limit.
-# For negative polarity PSU the value should be negative.
+# in mA.  The module will not ever set the current above the limit.
 CURRENT_LIMIT=5.0
+
+[serial]
+# The device is the name of the serial device file
+device = /dev/ttyUSB0
+
+# Technix SR100kV-5kW uses RS232 line specs: 1 start bit, 8 data bits,
+# 1 stop bit, no parity, Full Duplex mode, baud rate 9600
+baudrate = 9600
+databits = 8
+parity   = N
+stopbit  = 1
+startbit = 1

@@ -12,10 +12,10 @@ cfg.read(configfile)
 
 # In config file, the voltages are given in kV for convenience.  But
 # the module uses V internally.  The currents are given and used in mA.
-MAX_VOLTAGE   = float(cfg.get('default', 'MAX_VOLTAGE'  )) * 1000.0
-MAX_CURRENT   = float(cfg.get('default', 'MAX_CURRENT'  ))
-VOLTAGE_LIMIT = float(cfg.get('default', 'VOLTAGE_LIMIT')) * 1000.0
-CURRENT_LIMIT = float(cfg.get('default', 'CURRENT_LIMIT'))
+MAX_VOLTAGE   = float(cfg.get('voltage', 'MAX_VOLTAGE'  )) * 1000.0
+MAX_CURRENT   = float(cfg.get('current', 'MAX_CURRENT'  ))
+VOLTAGE_LIMIT = float(cfg.get('voltage', 'VOLTAGE_LIMIT')) * 1000.0
+CURRENT_LIMIT = float(cfg.get('current', 'CURRENT_LIMIT'))
 
 INT_MAX=2**12-1
 
