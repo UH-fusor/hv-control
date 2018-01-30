@@ -152,8 +152,8 @@ def set_voltage(U):
     """Tries to set the voltage as U (given in volts).
     """
     global U_counted
-    # Using only 'int' rounds always towards zero.  By rounding first,
-    # we will have the closest value instead.
+    # Using only int() rounds always towards zero.  By rounding first,
+    # ie. int(round()), we will have the closest value instead.
     int_U = int(round(U/delta_U))
     if int_U<0: int_U=0
     if int_U>INT_MAX: int_U=INT_MAX
@@ -163,8 +163,8 @@ def set_voltage(U):
 
 def set_current(I):
     global I_counted
-    # Using only 'int' rounds always towards zero.  By rounding first,
-    # we will have the closest value instead.
+    # Using only int() rounds always towards zero.  By rounding first,
+    # ie. int(round()), we will have the closest value instead.
     int_I = int(round(I/delta_I))
     if int_I<0: int_I=0
     if int_I>INT_MAX: int_I=INT_MAX
