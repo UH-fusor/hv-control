@@ -253,7 +253,9 @@ def __send_command(command):
     """
     
     print(command)
-    return (0.0, 0.0)
+    nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
+    print(nbytes)
+    return str(serconnection.read_until(terminator='\r'))
 
 def __send_inquiry(command):
     """Checks whether the 'command' is both valid and such that it will
