@@ -261,8 +261,10 @@ def __send_inquiry(command):
     returns the result.
     """
     print(command)
-    nbytes = serconnection.write(command + serial.CR)
-    return serialconnection.read(3)
+    nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
+    print(nbytes)
+    #return str(serconnection.readline())
+    return str(serconnection.read_until(terminator='\r'))
 
 def decrypt_the_inquiry(X):
     """Returns the answer X for instruction E in more user friendly manner.
@@ -272,4 +274,6 @@ def decrypt_the_inquiry(X):
 
 if __name__=='__main__':
     #set_voltage(-10.0)
+    init_serial()
     get_status()
+    safehalt("The End.")
