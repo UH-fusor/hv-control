@@ -23,7 +23,7 @@ CURRENT_LIMIT=5.0
 
 [serial]
 # The port is the name of the serial device file
-port = /dev/ttyS0
+port = /dev/ttyUSB0
 
 # Technix SR100kV-5kW uses RS232 line specs: 1 start bit, 8 data bits,
 # 1 stop bit, no parity, Full Duplex mode, baud rate 9600
@@ -32,10 +32,10 @@ bytesize  = 8
 parity    = N
 stopbits  = 1
 startbits = 1
-rtscts    = True
+rtscts    = False
 dsrdtr    = False
 xonxoff   = False
 # Timeout in seconds.  When reading data from the serial port, wait
 # maximum 'timeout' seconds.  Float allowed. 'None' means forever, '0' is
 # a non-blocking mode.
-timeout = 5.0
+timeout = 0.2
