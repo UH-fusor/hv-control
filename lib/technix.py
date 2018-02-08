@@ -260,9 +260,9 @@ def __send_inquiry(command):
     not change the output of the PSU.  If true, sends the command and
     returns the result.
     """
-
     print(command)
-    return "The result"
+    nbytes = serconnection.write(command + serial.CR)
+    return serialconnection.read(3)
 
 def decrypt_the_inquiry(X):
     """Returns the answer X for instruction E in more user friendly manner.
@@ -271,4 +271,5 @@ def decrypt_the_inquiry(X):
 
 
 if __name__=='__main__':
-    set_voltage(-10.0)
+    #set_voltage(-10.0)
+    get_status()
