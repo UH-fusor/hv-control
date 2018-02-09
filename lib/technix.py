@@ -251,6 +251,28 @@ def __send_command(command):
     limits, and sends the command to the serial bus if everything is
     Ok.  Retuns a tuple (voltage, current) of measured values.
     """
+
+    # Check validity of command
+    
+    # TBC: command a1 returns 0 in the format a10000:
+    # is the correct format for the instruction d10 or d10000?
+
+    # TBA: possibly more intelligence to prevent unwanted command sequences.
+    
+    if command[0] not in ['d','P']:
+        print(command,"is an invalid command")
+        return
+    if command[0] == 'd':
+        if not (len(command) < 7 and command[1] in ['1','2'] and
+                    command[2:].isdigit() and
+                    int(command[2:]) >-1 and int(command[2:]) < 4096):
+            print(command,"is an invalid command")
+            return
+    if command[0] == 'P':
+        if not (len(command) == 3 and command[1] in ['5','6','7','8'] and
+                    command[2] in ['0','1']):
+            print(command,"is an invalid command")
+            return
     
     print(command)
     nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
