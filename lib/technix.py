@@ -262,6 +262,12 @@ def __send_inquiry(command):
     not change the output of the PSU.  If true, sends the command and
     returns the result.
     """
+
+    # Check validity of inquiry command
+    if command not in ['E','a1','a2']:
+        print(command,"is an invalid inquiry command")
+        return
+    
     print(command)
     nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
     print(nbytes)
@@ -271,7 +277,34 @@ def __send_inquiry(command):
 def decrypt_the_inquiry(X):
     """Returns the answer X for instruction E in more user friendly manner.
     """
-    print("Sorry, not implemented:", X)
+    if X[0]=='E':
+        dec2bin = bin(int(X[1:-1]))[2:]
+        binCode = '0' * (8-len(dec2bin)) + str(dec2bin)
+        print(binCode)
+        
+        if binCode[0] == '0': print('PL8 = 0 ==> Inhibit: idle')
+        else: print('PL8 = 1 ==> Inhibit: active')
+            
+        if binCode[1] == '0': print('PL7 = 0 ==> Remote mode')
+        else: print('PL7 = 1 ==> Local mode')
+            
+        if binCode[2] == '0': print('PL6 = 0 ==> Hv-Off: idle')
+        else: print('PL6 = 1 ==> Hv-Off: active')
+            
+        if binCode[3] == '0': print('PL5 = 0 ==> Hv-On: idle')
+        else: print('PL5 = 1 ==> Hv-On: active')
+            
+        if binCode[4] == '0': print('PL4 = 0 ==> Hv-Off status')
+        else: print('PL4 = 1 ==> Hv-On status')
+            
+        if binCode[5] == '0': print('PL3 = 0 ==> Closed interlock')
+        else: print('PL3 = 1 ==> Open interlock')
+            
+        if binCode[6] == '0': print('PL2 = 0 ==> No fault')
+        else: print('PL2 = 1 ==> Fault')
+            
+        if binCode[7] == '0': print('PL1 = 0 ==> Current regulation')
+        else: print('PL1 = 1 ==> Voltage regulation')
 
 
 if __name__=='__main__':
