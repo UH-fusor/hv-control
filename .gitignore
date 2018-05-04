@@ -3,3 +3,4 @@ __pycache__
 hv.conf
 hv.conf~
 lib/technix.pyc
+build

@@ -258,6 +258,9 @@ def __send_command(command):
     # is the correct format for the instruction d10 or d10000?
 
     # TBA: possibly more intelligence to prevent unwanted command sequences.
+
+    print("__send_command: '" + command + "'")
+    print("__send_command type(command): ", type(command))
     
     if command[0] not in ['d','P']:
         print(command,"is an invalid command")
@@ -293,12 +296,12 @@ def __send_inquiry(command):
     print(command)
     nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
     print(nbytes)
-    #return str(serconnection.readline())
-    return str(serconnection.read_until(terminator='\r'))
+    return serconnection.read_until(terminator='\r').decode()
 
 def decrypt_the_inquiry(X):
     """Returns the answer X for instruction E in more user friendly manner.
     """
+    print("decrypt_the_inquiry: ", X)
     if X[0]=='E':
         dec2bin = bin(int(X[1:-1]))[2:]
         binCode = '0' * (8-len(dec2bin)) + str(dec2bin)
