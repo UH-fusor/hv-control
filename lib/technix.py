@@ -263,24 +263,24 @@ def __send_command(command):
     print("__send_command type(command): ", type(command))
     
     if command[0] not in ['d','P']:
-        print(command,"is an invalid command")
+        print(command, "is an invalid command")
         return
     if command[0] == 'd':
         if not (len(command) < 7 and command[1] in ['1','2'] and
-                    command[2:].isdigit() and
-                    int(command[2:]) >-1 and int(command[2:]) < 4096):
-            print(command,"is an invalid command")
+                    command[2]==',' and command[3:].isdigit() and
+                    int(command[3:]) >=0 and int(command[3:]) <= INT_MAX):
+            print(command, "is an invalid command")
             return
     if command[0] == 'P':
-        if not (len(command) == 3 and command[1] in ['5','6','7','8'] and
-                    command[2] in ['0','1']):
-            print(command,"is an invalid command")
+        if not (len(command) == 4 and command[1] in ['5','6','7','8'] and
+                    and command[2]==',' and command[3] in ['0','1']):
+            print(command, "is an invalid command")
             return
     
     print(command)
     nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
     print(nbytes)
-    return str(serconnection.read_until(terminator='\r'))
+    return serconnection.read_until(terminator='\r')).decode()
 
 def __send_inquiry(command):
     """Checks whether the 'command' is both valid and such that it will
@@ -290,7 +290,7 @@ def __send_inquiry(command):
 
     # Check validity of inquiry command
     if command not in ['E','a1','a2']:
-        print(command,"is an invalid inquiry command")
+        print(command, "is an invalid inquiry command")
         return
     
     print(command)
