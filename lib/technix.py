@@ -273,14 +273,14 @@ def __send_command(command):
             return
     if command[0] == 'P':
         if not (len(command) == 4 and command[1] in ['5','6','7','8'] and
-                    and command[2]==',' and command[3] in ['0','1']):
+                    command[2]==',' and command[3] in ['0','1']):
             print(command, "is an invalid command")
             return
     
     print(command)
     nbytes = serconnection.write(bytes(command + '\r', encoding='utf-8'))
     print(nbytes)
-    return serconnection.read_until(terminator='\r')).decode()
+    return serconnection.read_until(terminator='\r').decode()
 
 def __send_inquiry(command):
     """Checks whether the 'command' is both valid and such that it will
