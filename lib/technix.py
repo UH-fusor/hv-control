@@ -301,7 +301,7 @@ def __send_inquiry(command):
 def decrypt_the_inquiry(X):
     """Returns the answer X for instruction E in more user friendly manner.
     """
-    print("decrypt_the_inquiry: ", X)
+    print("decrypt_the_inquiry: ", X.__str__())
     if X[0]=='E':
         dec2bin = bin(int(X[1:-1]))[2:]
         binCode = '0' * (8-len(dec2bin)) + str(dec2bin)
@@ -330,7 +330,10 @@ def decrypt_the_inquiry(X):
             
         if binCode[7] == '0': print('PL1 = 0 ==> Current regulation')
         else: print('PL1 = 1 ==> Voltage regulation')
-
+    elif X[:2]=='a1':
+        print('Voltage: %.2f V' % (float(X[2:])/INT_MAX * MAX_VOLTAGE))
+    elif X[:2]=='a2':
+        print('Current: %.4f mA' % (float(X[2:])/INT_MAX * MAX_CURRENT))
 
 if __name__=='__main__':
     #set_voltage(-10.0)
